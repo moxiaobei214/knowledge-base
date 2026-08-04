@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>个人知识库</title>
+<style>
+:root {
+  --primary: #3b5998;
+  --primary-light: #5b7bd0;
+  --primary-dark: #2d4373;
+  --primary-bg: #eef2fb;
+  --bg: #f0f2f5;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-sec: #6c7293;
+  --text-hint: #aaa;
+  --border: #e4e6eb;
+  --border-strong: #c4c6cc;
+  --cat-work: #3b5998;
+  --cat-work-bg: #eef2fb;
+  --cat-personal: #e67e22;
+  --cat-personal-bg: #fef5e7;
+  --tag-bg: #f0f2f5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.7; }
+
+/* ===== 顶部栏 ===== */
+.topbar { background:var(--primary); color:#fff; padding:0 20px; height:52px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(59,89,152,0.25); }
+.topbar-left { display:flex; align-items:center; gap:10px; }
+.topbar-logo { width:32px; height:32px; background:rgba(255,255,255,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.topbar-title { font-size:17px; font-weight:600; letter-spacing:1px; }
+.topbar-search { flex:1; max-width:420px; margin:0 24px; position:relative; }
+.topbar-search input { width:100%; padding:7px 12px 7px 34px; border:none; border-radius:20px; font-size:13px; font-family:inherit; background:rgba(255,255,255,0.15); color:#fff; outline:none; }
+.topbar-search input::placeholder { color:rgba(255,255,255,0.6); }
+.topbar-search input:focus { background:rgba(255,255,255,0.25); }
+.topbar-search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:14px; color:rgba(255,255,255,0.7); }
+.topbar-right { display:flex; align-items:center; gap:12px; }
+.topbar-date { font-size:12px; opacity:0.85; }
+.topbar-btn { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:12px; }
+.topbar-btn:hover { background:rgba(255,255,255,0.25); }
+
+/* ===== 布局 ===== */
+.layout { display:flex; min-height:calc(100vh - 52px); }
+
+/* ===== 侧边栏 ===== */
+.sidebar { width:220px; background:var(--card-bg); border-right:1px solid var(--border); padding:16px 0; flex-shrink:0; overflow-y:auto; }
+.sidebar-section { margin-bottom:20px; }
+.sidebar-title { font-size:12px; font-weight:600; color:var(--text-hint); padding:0 20px 8px; text-transform:uppercase; letter-spacing:1px; }
+.sidebar-item { padding:8px 20px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:space-between; transition:background 0.15s; }
+.sidebar-item:hover { background:var(--bg); }
+.sidebar-item.active { background:var(--primary-bg); color:var(--primary); font-weight:600; border-left:3px solid var(--primary); padding-left:17px; }
+.sidebar-item-count { font-size:11px; color:var(--text-hint); background:var(--bg); padding:1px 8px; border-radius:10px; }
+.sidebar-item.active .sidebar-item-count { background:var(--primary); color:#fff; }
+.sidebar-sub { padding-left:20px; }
+.sidebar-sub .sidebar-item { font-size:13px; padding-left:40px; }
+.sidebar-tag-cloud { padding:8px 16px; display:flex; flex-wrap:wrap; gap:6px; }
+.sidebar-tag { font-size:12px; padding:2px 10px; background:var(--tag-bg); border-radius:12px; cursor:pointer; color:var(--text-sec); transition:all 0.15s; }
+.sidebar-tag:hover { background:var(--primary); color:#fff; }
+.sidebar-tag.active { background:var(--primary); color:#fff; }
+
+/* ===== 主内容 ===== */
+.main { flex:1; padding:20px 24px; max-width:1000px; overflow-x:hidden; }
+.tab-content { display:none; }
+.tab-content.active { display:block; animation:fadeIn 0.25s; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+/* ===== 统计卡片 ===== */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin-bottom:20px; }
+.stat-card { background:var(--card-bg); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); text-align:center; cursor:pointer; transition:all 0.2s; }
+.stat-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); border:1px solid var(--primary-light); }
+.stat-card:active { transform:translateY(0); }
+.stat-value { font-size:26px; font-weight:700; color:var(--primary); }
+.stat-label { font-size:12px; color:var(--text-sec); margin-top:4px; }
+.stat-icon { font-size:22px; margin-bottom:4px; }
+
+/* ===== 卡片 ===== */
+.card { background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:20px; overflow:hidden; }
+.card-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-title { font-size:15px; font-weight:600; display:flex; align-items:center; gap:6px; }
+.card-title::before { content:''; width:4px; height:16px; background:var(--primary); border-radius:2px; }
+.card-body { padding:18px; }
+
+/* ===== 知识条目 ===== */
+.kn-entry { border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin-bottom:12px; transition:all 0.15s; cursor:pointer; }
+.kn-entry:hover { border-color:var(--primary); box-shadow:var(--shadow-hover); }
+.kn-entry-header { display:flex; align-items:start; justify-content:space-between; margin-bottom:6px; gap:10px; }
+.kn-title { font-size:15px; font-weight:600; flex:1; line-height:1.5; }
+.kn-stars { font-size:13px; color:#f0c040; white-space:nowrap; }
+.kn-content { font-size:13px; color:var(--text-sec); line-height:1.7; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.kn-meta { display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:12px; }
+.kn-cat { padding:2px 10px; border-radius:4px; font-size:12px; font-weight:500; }
+.kn-cat-work { background:var(--cat-work-bg); color:var(--cat-work); }
+.kn-cat-personal { background:var(--cat-personal-bg); color:var(--cat-personal); }
+.kn-tag { background:var(--tag-bg); padding:2px 8px; border-radius:10px; font-size:11px; color:var(--text-sec); }
+.kn-date { color:var(--text-hint); }
+.kn-source { color:var(--text-sec); font-style:italic; }
+.kn-actions { display:flex; gap:6px; margin-top:8px; }
+
+/* ===== 按钮 ===== */
+.btn { padding:7px 16px; border-radius:6px; border:none; cursor:pointer; font-size:13px; font-weight:500; transition:all 0.15s; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-outline { background:transparent; border:1px solid var(--border-strong); color:var(--text); }
+.btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+.btn-sm { padding:4px 10px; font-size:12px; }
+.btn-danger { background:#e74c3c; color:#fff; }
+.btn-danger:hover { background:#c0392b; }
+a.btn { display:inline-flex; align-items:center; text-decoration:none; }
+
+/* ===== 输入 ===== */
+input,select,textarea { padding:8px 12px; border:1px solid var(--border-strong); border-radius:6px; font-size:13px; font-family:inherit; outline:none; transition:border 0.15s; }
+input:focus,select:focus,textarea:focus { border-color:var(--primary); }
+textarea { resize:vertical; }
+
+/* ===== 模态框 ===== */
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:#fff; border-radius:12px; width:92%; max-width:600px; max-height:88vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
+.modal-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:16px; font-weight:600; }
+.modal-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-sec); line-height:1; }
+.modal-body { padding:20px; }
+.modal-footer { padding:12px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+.form-group { margin-bottom:14px; }
+.form-label { display:block; font-size:13px; font-weight:500; margin-bottom:5px; color:var(--text-sec); }
+.form-row { display:flex; gap:12px; }
+.form-row>* { flex:1; }
+
+/* ===== 标签 ===== */
+.tag-pills { display:flex; flex-wrap:wrap; gap:6px; padding:4px 0; }
+.tag-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; background:var(--tag-bg); border-radius:12px; font-size:12px; }
+.tag-pill-remove { cursor:pointer; opacity:0.5; font-size:14px; line-height:1; }
+.tag-pill-remove:hover { opacity:1; }
+
+/* ===== 星级 ===== */
+.star-rating { display:inline-flex; gap:2px; }
+.star { cursor:pointer; font-size:18px; color:#ddd; }
+.star.active { color:#f0c040; }
+
+/* ===== 推送卡片 ===== */
+.push-card { display:flex; gap:14px; padding:16px; border-radius:var(--radius-sm); background:linear-gradient(135deg,var(--primary-bg) 0%,#fff 100%); border:1px solid var(--border); margin-bottom:10px; }
+.push-rank { width:32px; height:32px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+.push-content { flex:1; }
+.push-title { font-size:14px; font-weight:600; margin-bottom:4px; }
+.push-reason { font-size:12px; color:var(--text-sec); font-style:italic; }
+
+/* ===== 图谱 ===== */
+.graph-container { position:relative; min-height:400px; background:var(--bg); border-radius:var(--radius-sm); overflow:hidden; }
+.graph-node { position:absolute; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+.graph-node:hover { transform:scale(1.08); }
+.graph-node.root { background:var(--primary); color:#fff; font-weight:600; }
+.graph-node.cat-work { background:var(--cat-work-bg); color:var(--cat-work); border:1px solid var(--cat-work); }
+.graph-node.cat-personal { background:var(--cat-personal-bg); color:var(--cat-personal); border:1px solid var(--cat-personal); }
+.graph-node.leaf { background:#fff; color:var(--text-sec); border:1px solid var(--border-strong); font-size:12px; max-width:180px; overflow:hidden; text-overflow:ellipsis; }
+
+/* ===== Toast ===== */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:#fff; padding:12px 24px; border-radius:8px; font-size:14px; z-index:300; opacity:0; transform:translateY(20px); transition:all 0.3s; }
+.toast.show { opacity:1; transform:translateY(0); }
+
+/* ===== 空状态 ===== */
+.empty { text-align:center; padding:40px; color:var(--text-hint); }
+.empty-icon { font-size:42px; margin-bottom:10px; }
+
+/* ===== 时间线 ===== */
+.timeline { position:relative; padding-left:24px; }
+.timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:var(--border-strong); }
+.timeline-item { position:relative; margin-bottom:16px; padding-bottom:16px; }
+.timeline-item::before { content:''; position:absolute; left:-20px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--primary); border:2px solid #fff; }
+.timeline-date { font-size:12px; color:var(--text-hint); margin-bottom:4px; }
+.timeline-title { font-size:14px; font-weight:500; }
+
+/* ===== 搜索高亮 ===== */
+.highlight { background:#fff3cd; padding:1px 3px; border-radius:3px; }
+
+/* ===== 阅读状态 ===== */
+.unread-badge { display:inline-block; width:8px; height:8px; background:#e74c3c; border-radius:50%; margin-left:6px; }
+.kn-entry.read { opacity:0.7; }
+.kn-entry.read .kn-title { color:var(--text-sec); }
+
+/* ===== 手机底部导航栏 ===== */
+.mobile-nav { display:none; }
+.mobile-drawer-overlay { display:none; }
+.mobile-search-bar { display:none; }
+
+/* ===== 手机响应式 ===== */
+@media(max-width:768px) {
+  :root { --radius:8px; --radius-sm:4px; }
+
+  /* 顶部栏适配 */
+  .topbar { padding:0 12px; height:48px; }
+  .topbar-title { font-size:15px; }
+  .topbar-search { display:none; }
+  .topbar-date { display:none; }
+  .topbar-btn { font-size:11px; padding:4px 8px; }
+  .topbar-btn:not(:last-child) { display:none; }
+  .mobile-search-bar { display:block; padding:8px 12px; background:var(--card-bg); border-bottom:1px solid var(--border); position:sticky; top:48px; z-index:99; }
+  .mobile-search-bar input { width:100%; padding:8px 12px 8px 34px; border:1px solid var(--border-strong); border-radius:20px; font-size:13px; }
+  .mobile-search-bar .ms-icon { position:absolute; left:22px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text-hint); }
+
+  /* 布局 */
+  .layout { display:block; }
+
+  /* 侧边栏改为抽屉 */
+  .sidebar {
+    position:fixed; top:0; left:0; bottom:0; width:280px; z-index:300;
+    transform:translateX(-100%); transition:transform 0.3s ease;
+    box-shadow:2px 0 20px rgba(0,0,0,0.15);
+  }
+  .sidebar.open { transform:translateX(0); }
+  .mobile-drawer-overlay {
+    display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.45); z-index:250;
+  }
+  .mobile-drawer-overlay.show { display:block; }
+
+  /* 主内容区 */
+  .main { padding:12px; max-width:100%; padding-bottom:80px; }
+
+  /* 统计卡片 */
+  .stats-grid { grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .stat-card { padding:10px 6px; }
+  .stat-value { font-size:20px; }
+  .stat-label { font-size:10px; }
+  .stat-icon { font-size:18px; }
+
+  /* 双栏变单栏 */
+  .main > .tab-content > [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; gap:14px !important; }
+  .main > .tab-content [style*="display:flex;gap:8px;align-items:center"] { flex-wrap:wrap; }
+
+  /* 卡片 */
+  .card { margin-bottom:14px; }
+  .card-header { padding:10px 14px; }
+  .card-title { font-size:14px; }
+  .card-body { padding:12px; }
+
+  /* 知识条目 */
+  .kn-entry { padding:12px; margin-bottom:10px; }
+  .kn-title { font-size:14px; }
+  .kn-content { font-size:12px; -webkit-line-clamp:2; }
+  .kn-meta { gap:6px; font-size:11px; }
+  .kn-cat { font-size:10px; padding:1px 8px; }
+  .kn-tag { font-size:10px; padding:1px 6px; }
+  .kn-actions { gap:4px; }
+  .kn-actions .btn { font-size:11px; padding:3px 8px; }
+
+  /* 按钮 */
+  .btn { font-size:12px; padding:6px 14px; }
+
+  /* 模态框 */
+  .modal { width:94%; max-height:90vh; border-radius:10px; }
+  .modal-header { padding:12px 16px; }
+  .modal-title { font-size:15px; }
+  .modal-body { padding:16px; }
+  .modal-footer { padding:10px 16px; }
+  .form-row { flex-direction:column; gap:0; }
+
+  /* 推送卡片 */
+  .push-card { padding:12px; gap:10px; }
+  .push-rank { width:28px; height:28px; font-size:12px; }
+  .push-title { font-size:13px; }
+
+  /* 图谱 */
+  .graph-container { min-height:300px; overflow-x:auto; }
+
+  /* Toast */
+  .toast { bottom:80px; right:12px; left:12px; text-align:center; font-size:13px; }
+
+  /* 空状态 */
+  .empty { padding:30px; }
+  .empty-icon { font-size:36px; }
+
+  /* 时间线 */
+  .timeline { padding-left:20px; }
+
+  /* 底部导航 */
+  .mobile-nav {
+    display:flex; position:fixed; bottom:0; left:0; right:0;
+    background:var(--card-bg); border-top:1px solid var(--border);
+    z-index:200; height:56px; padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:0 -2px 10px rgba(0,0,0,0.06);
+  }
+  .mobile-nav-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:10px; color:var(--text-sec); cursor:pointer; transition:color 0.15s;
+    gap:2px; -webkit-tap-highlight-color:transparent; user-select:none;
+  }
+  .mobile-nav-item .mn-icon { font-size:20px; line-height:1; }
+  .mobile-nav-item.active { color:var(--primary); }
+
+  /* 浮动添加按钮 */
+  .mobile-fab {
+    display:flex; position:fixed; bottom:68px; right:16px;
+    width:48px; height:48px; border-radius:50%;
+    background:var(--primary); color:#fff; align-items:center; justify-content:center;
+    font-size:24px; box-shadow:0 4px 16px rgba(59,89,152,0.35);
+    z-index:200; cursor:pointer; border:none; padding:0;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* 汉堡菜单按钮 */
+  .mobile-menu-btn {
+    display:flex; background:none; border:none; color:#fff;
+    font-size:20px; cursor:pointer; align-items:center; padding:4px;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* 搜索高亮 */
+  .highlight { font-size:12px; }
+}
+
+/* 隐藏滚动条但保留功能 */
+.sidebar::-webkit-scrollbar { width:4px; }
+.sidebar::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="mobile-menu-btn" onclick="toggleDrawer()">☰</button>
+    <div class="topbar-logo">📖</div>
+    <div class="topbar-title">个人知识库</div>
+  </div>
+  <div class="topbar-search">
+    <span class="topbar-search-icon">🔍</span>
+    <input type="text" id="globalSearch" placeholder="搜索知识条目..." oninput="handleSearch(this.value)">
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-date" id="topbarDate"></span>
+    <button class="topbar-btn" onclick="openAddModal()">➕ 添加知识</button>
+    <button class="topbar-btn" onclick="exportData()">📤 导出</button>
+    <button class="topbar-btn" onclick="document.getElementById('importFile').click()">📥 导入</button>
+    <button class="topbar-btn" onclick="resetData()" style="color:#e74c3c">🔄 重置</button>
+    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- 手机搜索栏 -->
+<div class="mobile-search-bar">
+  <span class="ms-icon">🔍</span>
+  <input type="text" id="mobileSearch" placeholder="搜索知识条目..." oninput="syncSearch(this.value)">
+</div>
+
+<div class="layout">
+  <!-- 手机侧边栏遮罩 -->
+  <div class="mobile-drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <!-- 侧边栏 -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">导航</div>
+      <div class="sidebar-item active" onclick="switchView('dashboard')">📊 知识首页</div>
+      <div class="sidebar-item" onclick="switchView('all')">📚 全部条目 <span class="sidebar-item-count" id="navAllCount">0</span></div>
+      <div class="sidebar-item" onclick="switchView('push')">🔔 每日推送 <span class="sidebar-item-count" id="navPushCount">0</span></div>
+      <div class="sidebar-item" onclick="switchView('graph')">🕸️ 知识图谱</div>
+      <div class="sidebar-item" onclick="switchView('timeline')">📅 时间线</div>
+      <div class="sidebar-item" onclick="switchView('reading')">📖 阅读清单 <span class="sidebar-item-count" id="navReadingCount">0</span></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">工作知识</div>
+      <div class="sidebar-item" onclick="filterByCat('工作知识')">📁 全部工作知识 <span class="sidebar-item-count" id="catWorkCount">0</span></div>
+      <div class="sidebar-sub">
+        <div class="sidebar-item" onclick="filterBySub('工作知识','课题研究')">🔬 课题研究 <span class="sidebar-item-count" id="sub1Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('工作知识','国资央企')">🏢 国资央企 <span class="sidebar-item-count" id="sub2Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('工作知识','党校工作')">🏫 党校工作 <span class="sidebar-item-count" id="sub6Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('工作知识','干部队伍建设')">👤 干部队伍建设 <span class="sidebar-item-count" id="sub7Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('工作知识','党的理论')">📕 党的理论 <span class="sidebar-item-count" id="sub8Count">0</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">个人知识</div>
+      <div class="sidebar-item" onclick="filterByCat('个人知识')">📁 全部个人知识 <span class="sidebar-item-count" id="catPersonalCount">0</span></div>
+      <div class="sidebar-sub">
+        <div class="sidebar-item" onclick="filterBySub('个人知识','工作技能')">💼 工作技能 <span class="sidebar-item-count" id="sub3Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('个人知识','自媒体')">📱 自媒体 <span class="sidebar-item-count" id="sub4Count">0</span></div>
+        <div class="sidebar-item" onclick="filterBySub('个人知识','兴趣爱好')">🎨 兴趣爱好 <span class="sidebar-item-count" id="sub5Count">0</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">热门标签</div>
+      <div class="sidebar-tag-cloud" id="tagCloud"></div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="main">
+
+    <!-- ===== 知识首页 ===== -->
+    <div class="tab-content active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" onclick="filterByAll()"><div class="stat-icon">📚</div><div class="stat-value" id="dashTotal">0</div><div class="stat-label">知识总量</div></div>
+        <div class="stat-card" onclick="filterByCat('工作知识')"><div class="stat-icon">📁</div><div class="stat-value" id="dashWork">0</div><div class="stat-label">工作知识</div></div>
+        <div class="stat-card" onclick="filterByCat('个人知识')"><div class="stat-icon">💎</div><div class="stat-value" id="dashPersonal">0</div><div class="stat-label">个人知识</div></div>
+        <div class="stat-card" onclick="filterByStar()"><div class="stat-icon">⭐</div><div class="stat-value" id="dashStar">0</div><div class="stat-label">高星收藏</div></div>
+        <div class="stat-card" onclick="filterByWeek()"><div class="stat-icon">📅</div><div class="stat-value" id="dashWeek">0</div><div class="stat-label">本周新增</div></div>
+        <div class="stat-card" onclick="switchView('reading')"><div class="stat-icon">🔖</div><div class="stat-value" id="dashUnread">0</div><div class="stat-label">待阅读</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">每日推荐</div><button class="btn btn-outline btn-sm" onclick="switchView('push')">全部 →</button></div>
+          <div class="card-body" id="dashPush"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">最近添加</div><button class="btn btn-outline btn-sm" onclick="switchView('all')">全部 →</button></div>
+          <div class="card-body" id="dashRecent"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">分类分布</div></div>
+        <div class="card-body" id="dashDist"></div>
+      </div>
+    </div>
+
+    <!-- ===== 全部条目 ===== -->
+    <div class="tab-content" id="view-all">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="allTitle">全部条目</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="sortSelect" onchange="renderAll()" style="font-size:12px">
+              <option value="date-desc">最新优先</option>
+              <option value="date-asc">最早优先</option>
+              <option value="star-desc">高星优先</option>
+              <option value="title">标题排序</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">➕ 添加</button>
+          </div>
+        </div>
+        <div class="card-body" id="allList"></div>
+      </div>
+    </div>
+
+    <!-- ===== 每日推送 ===== -->
+    <div class="tab-content" id="view-push">
+      <div class="card">
+        <div class="card-header"><div class="card-title">每日知识推送</div><button class="btn btn-outline btn-sm" onclick="generatePush()">🔄 刷新推荐</button></div>
+        <div class="card-body" id="pushList"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">推送设置</div></div>
+        <div class="card-body" style="font-size:13px;color:var(--text-sec);line-height:2">
+          <p>📌 <b>推送逻辑</b>：5大专区各推2篇（1篇重要性最高 + 1篇时效性最高），共10篇精华内容</p>
+          <p>📂 <b>五大专区</b>：课题研究（国企思政）· 国资央企 · 党校工作 · 干部队伍建设 · 党的理论</p>
+          <p>📰 <b>主要来源</b>：思想政治研究、学习时报、求是、党建、国资委、中央党校、干部教育研究、CSSCI/北大核心期刊</p>
+          <p>⏰ <b>定时推送</b>：配合 WorkBuddy 自动化任务，每天早上 9:00 自动推送当日推荐</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 知识图谱 ===== -->
+    <div class="tab-content" id="view-graph">
+      <div class="card">
+        <div class="card-header"><div class="card-title">知识图谱</div></div>
+        <div class="card-body">
+          <div class="graph-container" id="graphContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 时间线 ===== -->
+    <div class="tab-content" id="view-timeline">
+      <div class="card">
+        <div class="card-header"><div class="card-title">知识时间线</div></div>
+        <div class="card-body"><div class="timeline" id="timelineList"></div></div>
+      </div>
+    </div>
+
+    <!-- ===== 阅读清单 ===== -->
+    <div class="tab-content" id="view-reading">
+      <div class="card">
+        <div class="card-header"><div class="card-title">阅读清单（待读）</div></div>
+        <div class="card-body" id="readingList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">添加知识</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" id="modalConfirm">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 手机底部导航栏 -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-item active" onclick="switchView('dashboard')">
+    <span class="mn-icon">📊</span><span>首页</span>
+  </div>
+  <div class="mobile-nav-item" onclick="switchView('all')">
+    <span class="mn-icon">📚</span><span>全部</span>
+  </div>
+  <div class="mobile-nav-item" onclick="switchView('push')">
+    <span class="mn-icon">🔔</span><span>推送</span>
+  </div>
+  <div class="mobile-nav-item" onclick="switchView('reading')">
+    <span class="mn-icon">📖</span><span>待读</span>
+  </div>
+  <div class="mobile-nav-item" onclick="switchView('graph')">
+    <span class="mn-icon">🕸️</span><span>图谱</span>
+  </div>
+</nav>
+
+<!-- 手机浮动添加按钮 -->
+<button class="mobile-fab" onclick="openAddModal()">+</button>
+
+<script>
+// ===== 数据模型 =====
+const STORE_KEY = 'kn_base_data_v8';
+const DATA_VERSION = '2026-08-04-v1'; // 每次更新种子数据时递增此版本号
+let store = loadData();
+let currentView = 'dashboard';
+let currentFilter = { cat: '', sub: '', tag: '', search: '', starMin: 0, weekOnly: false };
+let editId = null;
+
+function loadData() {
+  try {
+    const d = localStorage.getItem(STORE_KEY);
+    if (d) {
+      const parsed = JSON.parse(d);
+      // 版本检测：如果存储的数据版本与当前版本不匹配，加载新的种子数据
+      if (parsed.dataVersion === DATA_VERSION) return parsed;
+      console.log('数据版本已更新，正在加载新内容...');
+    }
+  } catch(e) {}
+  return getDefaultData();
+}
+function saveData() { store.dataVersion = DATA_VERSION; localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+
+function getDefaultData() {
+  return { entries: getSeedData(), nextId: 100, pushDate: '', dataVersion: DATA_VERSION };
+}
+
+function resetData() {
+  if (!confirm('确定要重置数据吗？这将恢复为最新推送内容，你手动添加的条目将被清除。')) return;
+  localStorage.removeItem(STORE_KEY);
+  store = getDefaultData();
+  saveData();
+  switchView('dashboard');
+  showToast('数据已重置为最新内容');
+}
+
+function getSeedData() {
+  return [
+    // ===== 课题研究（重要性+时效性各1篇）=====
+    { id:1, title:"中国石油戴厚良：汇聚当好能源保供“顶梁柱”的思想力量", content:"中国石油集团党组书记、董事长戴厚良在《思想政治工作研究》刊发署名文章，系统阐述以《中国共产党思想政治工作条例》为基本遵循，守正创新加强国企思政工作的实践路径。①坚持政治引领强信心——推动党的创新理论进企业、进车间、进班组、进岗位、进头脑，把党对思政工作的领导由“软指标”变为“硬约束”。②坚持凝聚共识筑同心——连续6年开展“转观念”主题教育，凝练宣贯“九种观念”，构建纵向到底、横向到边的思政工作格局。③坚持价值感召聚民心——以石油精神和大庆精神铁人精神为核心推进文化建设，连续15年“石油魂”巡回宣讲超千场，丰富新时代企业文化内涵。④坚持关心关怀暖人心——推动EAP员工帮助计划，建立“互联网+思政”新模式，开通“党组信箱”架起联系百万石油人的“连心桥”。", category:"工作知识", subcategory:"课题研究", tags:["国企思政","思想政治工作条例","石油精神","企业文化","人文关怀","戴厚良"], source:"《思想政治工作研究》/国资委网站", url:"http://www.sasac.gov.cn/n2588025/n2641611/c35440085/content.html", stars:5, date:"2026-05-28", read:false, links:[2], pushType:"重要性" },
+    { id:2, title:"通辽市国资委党委“通达辽阔”思想政治工作法护航国企重组整合创新案例", content:"2026年8月3日发布，通辽市国资委从城市文旅名片中汲取智慧，凝练形成“通达辽阔”四字思想政治工作法。①“通”——把准思想脉搏：把思想摸底列为重组前置程序，做到“资产底数与思想底数一并摸清”，先统一思想再推进整合。②“达”——解开职工心结：建立诉求“交办、督办、回访”闭环机制，情绪疏导不过夜。城发集团建立“支部书记谈心”机制，定期开展“满天星”职工心理健康关爱活动。③“辽”——立起发展愿景：讲清“改革为什么、企业往哪走、职工怎么办”三个问题，把形势任务教育与战略宣讲统一安排。④“阔”——凝聚人心合力：将铸牢中华民族共同体意识与企业重组同步部署，组建国资国企宣讲团深入一线巡回宣讲。全系统未发生因思政工作不到位引发的群体性矛盾。", category:"工作知识", subcategory:"课题研究", tags:["国企思政","重组整合","人文关怀","心理疏导","职工思想动态","民族团结"], source:"通辽市国资委", url:"https://www.tongliao.gov.cn/xwzx/jrgz/202608/t20260803_1063435.html", stars:4, date:"2026-08-03", read:false, links:[1], pushType:"时效性" },
+
+    // ===== 国资央企（重要性+时效性各1篇）=====
+    { id:3, title:"国务院国资委举办地方国资委负责人研讨班——以更高站位更大力度加快做强做优做大国有企业和国有资本", content:"2026年7月28日至29日，国务院国资委在京举办地方国资委负责人研讨班。国资委党委书记、主任程福波出席并讲话。①总结上半年成绩——地方监管企业实现利润总额8126.8亿元，同比增长7%，完成固定资产投资2.6万亿元，资产配置效率加快提升。②明确下半年六项“突出抓好”——高质量的稳增长、企业科技创新能力提升、国有经济布局优化和结构调整、新一轮国资国企改革实施、国资监管效能提升、重大风险防范化解。③以“十五五”规划和推进新一轮改革为总抓手——推动传统产业转型升级，因地制宜打造新兴支柱产业，加快推动国有资本“三个集中”。④深入学习贯彻习近平党建思想——推动树立和践行正确政绩观学习教育走深走实，加强高素质专业化干部人才队伍建设，纵深推进全面从严治党。", category:"工作知识", subcategory:"国资央企", tags:["国资央企","十五五","国企改革","新质生产力","三个集中","程福波"], source:"国资委新闻中心", url:"http://www.sasac.gov.cn/n2588020/n2877938/n2879597/n2879599/c35703425/content.html", stars:5, date:"2026-07-29", read:false, links:[4], pushType:"重要性" },
+    { id:4, title:"国务院国资委发布央企人工智能领域系列成果——构筑全链条能力布局赋能实体经济", content:"2026世界人工智能大会期间，国务院国资委正式发布开源“焕新社区”2.0、第二批央企AI战略性高价值场景和行业高质量数据集，启动“国资央企智能软件工厂联合筑基工程”。①“焕新社区”2.0版升级——全新推出“央企模数共振空间”，扩展智算供给至13类，覆盖国产芯片市占率超90%，升级新建通信、安全、电力、医疗、轨交、交通六大行业专区。②发布“双百”战略资源体系——60项高价值场景覆盖工业制造、智慧能源、交通物流等领域，70项高质量数据集夯实AI训练基座。③启动联合筑基工程——聚合首批13家央企研发力量，由分散试点转向全系统协同共建，构建自主可控、共建共享的智能软件生产新范式。④下一步——深入推进央企“AI+”专项行动，加快孵化可复制可推广的行业标杆示范，持续以数智创新成果培育壮大新质生产力。", category:"工作知识", subcategory:"国资央企", tags:["国资央企","人工智能","新质生产力","AI+","焕新社区","算力基础设施"], source:"国资小新(公众号)/科技日报", url:"http://www.sasac.gov.cn/n2588025/n2588139/c35648184/content.html", stars:4, date:"2026-07-21", read:false, links:[3], pushType:"时效性" },
+
+    // ===== 党校工作（重要性+时效性各1篇）=====
+    { id:5, title:"云南启动云岭名师培养工程——推动全省党校师资队伍建设走深走实", content:"2026年7月21日中央党校网站报道，云南省委党校创新师资培训模式，择优遴选37名省市县党校青年骨干举办云岭干教名师培养专题研讨班。①构建五步闭环培育体系——打造“训前备学→浙江观学→深圳践学→校内研学→全域拓学”全链条，对标国家级精品课程，系统学习课程架构和案例编撰方法。②推动教学模式本土转化——吸收浙江“八八战略”现场教学和深圳情景模拟等创新形式，融入本地案例，破解理论宣讲脱离实际、内容空洞等问题。③打破层级壁垒——培训覆盖省市县三级党校，混搭分组集体备课，构建上下联动、资源互通、优势互补的教研新格局。④坚持从严治教——将“两个确立”“两个维护”贯穿教学全过程，以严实学风锤炼师德师风。此举为全国党校系统师资建设提供了可借鉴样本。", category:"工作知识", subcategory:"党校工作", tags:["党校工作","师资队伍","教学改革","为党育才","基本培训","云南"], source:"中央党校(国家行政学院)网站", url:"https://www.ccps.gov.cn/dfjj/202607/t20260721_171740.shtml", stars:4, date:"2026-07-21", read:false, links:[6], pushType:"重要性" },
+    { id:6, title:"地方党校基本培训教学工作研讨会暨全省党校系统优秀教学研究成果交流会召开", content:"2026年7月27日《学习时报》报道，省委党校召开地方党校基本培训教学工作研讨会。核心要求：①强化党校姓党——深入学习贯彻习近平总书记“七一”重要讲话精神，学习贯彻习近平党建思想，始终把讲政治贯穿教学全过程。②突出抓好党的创新理论教育——把习近平新时代中国特色社会主义思想作为教学中心内容，加强党性知识培训和严格的党内政治生活训练。③抓好履职能力培训——聚焦高质量发展、现代化产业体系建设、社会治理、统筹发展和安全等任务设置专题。④提升教学水平——不断提升教学的政治水平、政策水平、学术水平、专业水平，切实增强教育培训的针对性和实效性。来自省市县三级党校、干部学院、省属企业党校的代表参加。", category:"工作知识", subcategory:"党校工作", tags:["党校工作","基本培训","教学改革","为党育才","履职能力","教学研讨"], source:"学习时报", url:"https://www.sohu.com/a/1055098555_121475763", stars:4, date:"2026-07-27", read:false, links:[5], pushType:"时效性" },
+
+    // ===== 干部队伍建设（重要性+时效性各1篇）=====
+    { id:7, title:"全面提升新时代干部履职能力", content:"《学习时报》2026年7月24日刊发，重庆市委党校常务副校长署名文章，系统阐释锻造与中国式现代化要求相适应的干部履职能力。①锤炼政治能力——依托原著精读与专题研学深度融通，构建“学思用贯通、知信行统一”转化闭环；推动案例教学、情景模拟等沉浸式方法嵌入干部教育，破解理论学习“浅表化”“标签化”倾向；在实践熔炉中淬炼，构建政治能力量化评估与动态监测机制。②提升推动高质量发展能力——围绕数字经济、人工智能、现代金融、绿色产业等重塑干部知识结构，在复合化履职情境中锤炼系统思考、统筹协调、跨域协同能力。③提升数字化履职能力——推动从经验主导的模糊判断跃迁至数据驱动的精准治理，创新“理论授课—案例拆解—现场实操”一体化培训模式。④统筹高水平安全能力——聚焦城市运行、公共安全、防灾减灾等领域开展应急处置演练，以底线思维托稳高质量发展大局。", category:"工作知识", subcategory:"干部队伍建设", tags:["干部队伍","政治能力","数字化","专业素养","高质量发展","学习时报"], source:"学习时报", url:"https://paper.studytimes.cn/app_cntheory/2026-07/24/content_9986624.html", stars:5, date:"2026-07-24", read:false, links:[8], pushType:"重要性" },
+    { id:8, title:"真本领干出真业绩——领导干部素养随谈", content:"2026年7月28日刊发，系统阐述新时代领导干部能力素养提升路径。①能力建设的时代紧迫性——百年变局加速演进，部分干部存在“身子进了新时代，思想还停留在过去”“老方法不顶用、新办法不会用”“心中无全景图、手上缺工具箱”等问题。②对标“七种能力”“八种本领”——涵盖政治能力、调查研究、科学决策、改革攻坚、应急处突、群众工作、抓落实等维度，构成新时代领导干部能力素养完整坐标系。③四大实践路径——深化思想淬炼（理论武装而非“装饰品”）、强化政治历练（提升“政治三力”）、实化实践锻炼（把发展一线作为最好课堂）、细化专业训练（科技、产业、金融等领域精进）。④组织赋能——坚持人岗相适、以事择人，为“洗碗”者撑腰、让实干者“吃香”，多一些正向激励、少一些求全责备。", category:"工作知识", subcategory:"干部队伍建设", tags:["干部队伍","能力建设","七种能力","八种本领","思想淬炼","实践锻炼"], source:"新乡日报/腾讯新闻", url:"https://new.qq.com/rain/a/20260728A0BDUK00", stars:4, date:"2026-07-28", read:false, links:[7], pushType:"时效性" },
+
+    // ===== 党的理论（重要性+时效性各1篇）=====
+    { id:9, title:"习近平：在庆祝中国共产党成立105周年大会上的讲话", content:"2026年7月1日，习近平总书记发表重要讲话，回顾党105年光辉历程，展望强国建设民族复兴光明前景。①四个“深刻改变”——从根本上改变了中国人民前途命运，开辟了中华民族伟大复兴正确道路，展示了马克思主义强大生命力，深刻影响了世界历史进程，锻造了走在时代前列的强大政党。②六个“无可比拟的优秀特质”——矢志追求真理、深深植根人民、勇担历史使命、顺应发展潮流、敢于善于斗争、注重强健自身。③五个“新征程要求”——毫不动摇坚持和加强党的全面领导、贯彻实施好“十五五”规划推动高质量发展、践行以人民为中心的发展思想、敢于斗争善于斗争、深入学习贯彻习近平党建思想推进全面从严治党。④核心论断——没有中国共产党就没有新中国，就没有中国式现代化光明前景，就没有中华民族伟大复兴。治国必先治党，党兴才能国强。", category:"工作知识", subcategory:"党的理论", tags:["党的理论","习近平","建党105周年","初心使命","两个确立","中国式现代化"], source:"新华社", url:"http://gs.xinhuanet.com/zuzhibu/20260702/d63f0fe989274c62806bd62974c5935a/c.html", stars:5, date:"2026-07-01", read:false, links:[10], pushType:"重要性" },
+    { id:10, title:"求是网评论员：通过强健自身锻造更加强大政党", content:"求是网2026年7月26日发表评论员文章，深入解读习近平总书记“七一”重要讲话精神，聚焦全面从严治党主题。①新时代全面从严治党取得历史性开创性成就——从落实中央八项规定开局破题，到“打虎”“拍蝇”“猎狐”多管齐下，党内政治生态明显好转，党的创造力凝聚力战斗力显著增强。②习近平党建思想是重大理论成果——坚持“两个结合”推进党的理论创新，鲜明提出“十四个坚持”，系统回答新时代管党治党、兴党强党怎么看、怎么干。③走好新的赶考之路——距离基本实现社会主义现代化仅9年，“四大考验”“四种危险”长期存在，必须以自我革命精神推进全面从严治党向纵深发展。④号召——牢记初心使命，矢志复兴伟业，全党全国各族人民坚定信心、接续奋斗，全面建成社会主义现代化强国的目标必定实现。", category:"工作知识", subcategory:"党的理论", tags:["党的理论","习近平党建思想","全面从严治党","自我革命","两个结合","求是"], source:"求是网", url:"https://www.qstheory.cn/20260726/71512a0430174fada16347160b213eb8/c.html", stars:4, date:"2026-07-26", read:false, links:[9], pushType:"时效性" }
+  ];
+}
+
+// ===== 日期 =====
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function formatDate(d){ const w=['日','一','二','三','四','五','六']; return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 周${w[d.getDay()]}`; }
+document.getElementById('topbarDate').textContent = formatDate(new Date());
+
+// ===== 视图切换 =====
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  closeDrawer(); // 手机端切换视图时关闭抽屉
+  updateMobileNav(view); // 更新底部导航高亮
+
+  if (view === 'dashboard') { renderDashboard(); activateSidebar('知识首页'); }
+  else if (view === 'all') { renderAll(); activateSidebar('全部条目'); }
+  else if (view === 'push') { renderPush(); activateSidebar('每日推送'); }
+  else if (view === 'graph') { renderGraph(); activateSidebar('知识图谱'); }
+  else if (view === 'timeline') { renderTimeline(); activateSidebar('时间线'); }
+  else if (view === 'reading') { renderReading(); activateSidebar('阅读清单'); }
+
+  // 手机端滚动回顶部
+  window.scrollTo(0, 0);
+}
+
+function activateSidebar(text) {
+  document.querySelectorAll('.sidebar-item').forEach(s => {
+    if (s.textContent.includes(text)) s.classList.add('active');
+  });
+}
+
+function filterByCat(cat) {
+  currentFilter = { cat, sub:'', tag:'', search:'', starMin:0, weekOnly:false };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = cat;
+}
+function filterBySub(cat, sub) {
+  currentFilter = { cat, sub, tag:'', search:'', starMin:0, weekOnly:false };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = sub;
+}
+function filterByTag(tag) {
+  currentFilter = { cat:'', sub:'', tag, search:'', starMin:0, weekOnly:false };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = '标签：' + tag;
+}
+function filterByAll() {
+  currentFilter = { cat:'', sub:'', tag:'', search:'', starMin:0, weekOnly:false };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = '全部条目';
+}
+function filterByStar() {
+  currentFilter = { cat:'', sub:'', tag:'', search:'', starMin:4, weekOnly:false };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = '高星收藏（4星以上）';
+}
+function filterByWeek() {
+  currentFilter = { cat:'', sub:'', tag:'', search:'', starMin:0, weekOnly:true };
+  document.getElementById('globalSearch').value = '';
+  const ms = document.getElementById('mobileSearch'); if (ms) ms.value = '';
+  switchView('all');
+  document.getElementById('allTitle').textContent = '本周新增';
+}
+
+function handleSearch(val) {
+  currentFilter = { cat:'', sub:'', tag:'', search: val, starMin:0, weekOnly:false };
+  const ms = document.getElementById('mobileSearch'); if (ms && ms.value !== val) ms.value = val;
+  if (val.length > 0) {
+    switchView('all');
+    document.getElementById('allTitle').textContent = '搜索：' + val;
+  } else {
+    switchView('dashboard');
+  }
+}
+
+// ===== 获取条目 =====
+function getFiltered() {
+  let items = [...store.entries];
+  if (currentFilter.cat) items = items.filter(e => e.category === currentFilter.cat);
+  if (currentFilter.sub) items = items.filter(e => e.subcategory === currentFilter.sub);
+  if (currentFilter.tag) items = items.filter(e => e.tags.includes(currentFilter.tag));
+  if (currentFilter.starMin) items = items.filter(e => e.stars >= currentFilter.starMin);
+  if (currentFilter.weekOnly) {
+    const weekAgo = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+    items = items.filter(e => e.date >= weekAgo);
+  }
+  if (currentFilter.search) {
+    const q = currentFilter.search.toLowerCase();
+    items = items.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      e.content.toLowerCase().includes(q) ||
+      e.tags.some(t => t.toLowerCase().includes(q))
+    );
+  }
+  return items;
+}
+
+function getSorted(items) {
+  const sort = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'date-desc';
+  const sorted = [...items];
+  if (sort === 'date-desc') sorted.sort((a,b) => b.date.localeCompare(a.date));
+  else if (sort === 'date-asc') sorted.sort((a,b) => a.date.localeCompare(b.date));
+  else if (sort === 'star-desc') sorted.sort((a,b) => b.stars - a.stars);
+  else if (sort === 'title') sorted.sort((a,b) => a.title.localeCompare(b.title));
+  return sorted;
+}
+
+// ===== 渲染条目 =====
+function renderEntry(e) {
+  const stars = '★'.repeat(e.stars) + '☆'.repeat(5-e.stars);
+  const catCls = e.category === '工作知识' ? 'kn-cat-work' : 'kn-cat-personal';
+  const tagsHtml = e.tags.map(t => `<span class="kn-tag" onclick="filterByTag('${t}');event.stopPropagation();">${t}</span>`).join('');
+  const linksHtml = e.links && e.links.length ? getLinks(e.links) : '';
+
+  let contentHtml = e.content;
+  if (currentFilter.search) {
+    const q = currentFilter.search;
+    contentHtml = contentHtml.replace(new RegExp(q, 'gi'), m => `<span class="highlight">${m}</span>`);
+  }
+  let titleHtml = e.title;
+  if (currentFilter.search) {
+    titleHtml = titleHtml.replace(new RegExp(currentFilter.search, 'gi'), m => `<span class="highlight">${m}</span>`);
+  }
+
+  return `<div class="kn-entry ${e.read?'read':''}" onclick="openDetail(${e.id})">
+    <div class="kn-entry-header">
+      <div class="kn-title">${titleHtml}${!e.read?'<span class="unread-badge"></span>':''}</div>
+      <div class="kn-stars">${stars}</div>
+    </div>
+    <div class="kn-content">${contentHtml}</div>
+    <div class="kn-meta">
+      <span class="kn-cat ${catCls}">${e.category} · ${e.subcategory}</span>
+      ${tagsHtml}
+      <span class="kn-date">📅 ${e.date}</span>
+      ${e.source ? (e.url ? `<a class="kn-source" href="${e.url}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--primary)">📰 ${e.source} ↗</a>` : `<span class="kn-source">📰 ${e.source}</span>`) : ''}
+    </div>
+    ${linksHtml ? `<div style="margin-top:6px;font-size:12px;color:var(--text-sec)">🔗 关联：${linksHtml}</div>` : ''}
+    <div class="kn-actions">
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();toggleRead(${e.id})">${e.read?'标为未读':'标为已读'}</button>
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openEditModal(${e.id})">编辑</button>
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();delEntry(${e.id})">删除</button>
+      ${e.url ? `<a class="btn btn-primary btn-sm" href="${e.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">查看原文 ↗</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function getLinks(ids) {
+  return ids.map(id => {
+    const e = store.entries.find(x => x.id === id);
+    return e ? `<span class="kn-tag" onclick="event.stopPropagation();openDetail(${id})">${e.title.slice(0,12)}${e.title.length>12?'...':''}</span>` : '';
+  }).join('');
+}
+
+// ===== 知识首页 =====
+function renderDashboard() {
+  const entries = store.entries;
+  document.getElementById('dashTotal').textContent = entries.length;
+  document.getElementById('dashWork').textContent = entries.filter(e => e.category === '工作知识').length;
+  document.getElementById('dashPersonal').textContent = entries.filter(e => e.category === '个人知识').length;
+  document.getElementById('dashStar').textContent = entries.filter(e => e.stars >= 4).length;
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+  document.getElementById('dashWeek').textContent = entries.filter(e => e.date >= weekAgo).length;
+  document.getElementById('dashUnread').textContent = entries.filter(e => !e.read).length;
+
+  updateSidebarCounts();
+
+  // 每日推荐
+  const pushed = getDailyPush();
+  document.getElementById('dashPush').innerHTML = pushed.length ? pushed.map((e,i) => `
+    <div class="push-card" onclick="openDetail(${e.id})">
+      <div class="push-rank">${i+1}</div>
+      <div class="push-content">
+        <div class="push-title">${e.title}</div>
+        <div class="push-reason">${e.reason}</div>
+        ${e.url ? `<a href="${e.url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--primary);text-decoration:none" onclick="event.stopPropagation()">📖 查看原文 ↗</a>` : ''}
+      </div>
+    </div>`).join('') : '<div class="empty"><div class="empty-icon">📭</div><div>暂无推荐</div></div>';
+
+  // 最近添加
+  const recent = [...entries].sort((a,b) => b.date.localeCompare(a.date)).slice(0,4);
+  document.getElementById('dashRecent').innerHTML = recent.map(renderEntry).join('');
+
+  // 分类分布
+  const dist = {};
+  entries.forEach(e => { const k = e.category + ' · ' + e.subcategory; dist[k] = (dist[k]||0) + 1; });
+  const max = Math.max(...Object.values(dist));
+  document.getElementById('dashDist').innerHTML = Object.entries(dist).sort((a,b) => b[1]-a[1]).map(([k,v]) => {
+    const isWork = k.includes('工作知识');
+    const color = isWork ? 'var(--cat-work)' : 'var(--cat-personal)';
+    const [cat, sub] = k.split(' · ');
+    return `<div style="margin-bottom:10px;cursor:pointer" onclick="filterBySub('${cat}','${sub}')">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${k}</span><span style="color:var(--text-sec)">${v}篇 ↗</span></div>
+      <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:${v/max*100}%;height:100%;background:${color};border-radius:3px;transition:width 0.3s"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function updateSidebarCounts() {
+  const e = store.entries;
+  document.getElementById('navAllCount').textContent = e.length;
+  document.getElementById('navPushCount').textContent = e.filter(x => !x.read).length;
+  document.getElementById('navReadingCount').textContent = e.filter(x => !x.read).length;
+  document.getElementById('catWorkCount').textContent = e.filter(x => x.category === '工作知识').length;
+  document.getElementById('catPersonalCount').textContent = e.filter(x => x.category === '个人知识').length;
+  document.getElementById('sub1Count').textContent = e.filter(x => x.subcategory === '课题研究').length;
+  document.getElementById('sub2Count').textContent = e.filter(x => x.subcategory === '国资央企').length;
+  document.getElementById('sub3Count').textContent = e.filter(x => x.subcategory === '工作技能').length;
+  document.getElementById('sub4Count').textContent = e.filter(x => x.subcategory === '自媒体').length;
+  document.getElementById('sub5Count').textContent = e.filter(x => x.subcategory === '兴趣爱好').length;
+  const sub6 = document.getElementById('sub6Count'); if (sub6) sub6.textContent = e.filter(x => x.subcategory === '党校工作').length;
+  const sub7 = document.getElementById('sub7Count'); if (sub7) sub7.textContent = e.filter(x => x.subcategory === '干部队伍建设').length;
+  const sub8 = document.getElementById('sub8Count'); if (sub8) sub8.textContent = e.filter(x => x.subcategory === '党的理论').length;
+
+  // 标签云
+  const tagCount = {};
+  e.forEach(x => x.tags.forEach(t => tagCount[t] = (tagCount[t]||0)+1));
+  const sorted = Object.entries(tagCount).sort((a,b) => b[1]-a[1]).slice(0,12);
+  document.getElementById('tagCloud').innerHTML = sorted.map(([t,c]) =>
+    `<span class="sidebar-tag" onclick="filterByTag('${t}')">${t} (${c})</span>`
+  ).join('');
+}
+
+// ===== 全部条目 =====
+function renderAll() {
+  const items = getSorted(getFiltered());
+  const list = document.getElementById('allList');
+  // 生成筛选条件提示
+  let filterDesc = '';
+  if (currentFilter.starMin) filterDesc += ` ⭐${currentFilter.starMin}星以上`;
+  if (currentFilter.weekOnly) filterDesc += ' 📅本周内';
+  if (filterDesc) filterDesc = `<span style="color:var(--primary);margin-left:6px">${filterDesc}</span>`;
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div>没有匹配的知识条目</div></div>';
+  } else {
+    list.innerHTML = `<div style="font-size:12px;color:var(--text-sec);margin-bottom:12px">共 ${items.length} 条${filterDesc}</div>` + items.map(renderEntry).join('');
+  }
+}
+
+// ===== 每日推送 =====
+function getDailyPush() {
+  // 按专区分组：课题研究、国资央企、党校工作、干部队伍建设、党的理论
+  const areas = ['课题研究','国资央企','党校工作','干部队伍建设','党的理论'];
+  const pushed = [];
+  areas.forEach(area => {
+    const items = store.entries.filter(e => e.subcategory === area);
+    // 重要性排序最高的1篇（星级最高）
+    const byImportance = [...items].sort((a,b) => b.stars - a.stars);
+    if (byImportance[0]) pushed.push({ ...byImportance[0], reason: '【重要性推荐】' + getPushReason(byImportance[0]) });
+    // 时效性排序最高的1篇（日期最新，且不与重要性重复）
+    const byTime = [...items].filter(e => !byImportance[0] || e.id !== byImportance[0].id).sort((a,b) => b.date.localeCompare(a.date));
+    if (byTime[0]) pushed.push({ ...byTime[0], reason: '【时效性推荐】' + getPushReason(byTime[0]) });
+  });
+  return pushed;
+}
+
+function getPushReason(e) {
+  const reasons = [];
+  if (e.stars >= 5) reasons.push('高星收藏');
+  else if (e.stars >= 4) reasons.push('重要知识');
+  if (!e.read) reasons.push('未阅读');
+  if (e.links && e.links.length) reasons.push(`关联${e.links.length}篇`);
+  reasons.push(e.subcategory);
+  return '推荐理由：' + reasons.join(' · ');
+}
+
+function renderPush() {
+  const pushed = getDailyPush();
+  document.getElementById('pushList').innerHTML = pushed.length ? pushed.map((e,i) => `
+    <div class="push-card" onclick="openDetail(${e.id})">
+      <div class="push-rank">${i+1}</div>
+      <div class="push-content">
+        <div class="push-title">${e.title}</div>
+        <div style="font-size:12px;color:var(--text-sec);margin-bottom:4px">${e.category} · ${e.subcategory} · ${e.date}</div>
+        <div class="push-reason">${e.reason}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        ${e.url ? `<a href="${e.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none;white-space:nowrap" onclick="event.stopPropagation()">原文 ↗</a>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();markRead(${e.id})">已读</button>
+      </div>
+    </div>`).join('') : '<div class="empty"><div class="empty-icon">✅</div><div>所有知识已阅读完毕！</div></div>';
+}
+
+function generatePush() {
+  store.pushDate = todayStr();
+  saveData();
+  renderPush();
+  showToast('推荐已刷新');
+}
+
+// ===== 知识图谱 =====
+function renderGraph() {
+  const container = document.getElementById('graphContainer');
+  const entries = store.entries;
+  if (entries.length === 0) { container.innerHTML = '<div class="empty"><div class="empty-icon">🕸️</div><div>暂无数据</div></div>'; return; }
+
+  // 构建树形结构
+  const tree = {};
+  entries.forEach(e => {
+    if (!tree[e.category]) tree[e.category] = {};
+    if (!tree[e.category][e.subcategory]) tree[e.category][e.subcategory] = [];
+    tree[e.category][e.subcategory].push(e);
+  });
+
+  let html = '';
+  const w = container.clientWidth || 600;
+  const cx = w / 2;
+  const centerY = 30;
+
+  // 中心节点
+  html += `<div class="graph-node root" style="left:${cx-50}px;top:${centerY}px;">个人知识库</div>`;
+
+  // 两个分类节点
+  const cats = Object.keys(tree);
+  cats.forEach((cat, ci) => {
+    const catX = 80 + ci * (w - 200);
+    const catY = 100;
+    const cls = cat === '工作知识' ? 'cat-work' : 'cat-personal';
+    html += `<div class="graph-node ${cls}" style="left:${catX}px;top:${catY}px;">${cat} (${entries.filter(e=>e.category===cat).length})</div>`;
+
+    // SVG 连线 (简化用border代替)
+    let subIdx = 0;
+    Object.keys(tree[cat]).forEach((sub, si) => {
+      const subX = 30 + (ci * 2 + si) * (w / (cats.length * Object.keys(tree[cat]).length + 1));
+      const subY = 180 + si * 80;
+      html += `<div class="graph-node leaf" style="left:${subX}px;top:${subY}px;max-width:140px" onclick="filterBySub('${cat}','${sub}')">${sub} (${tree[cat][sub].length})</div>`;
+
+      // 条目节点
+      tree[cat][sub].forEach((e, ei) => {
+        const eX = subX + 150 + (ei % 2) * 10;
+        const eY = subY + ei * 22;
+        if (eY < 450) {
+          html += `<div class="graph-node leaf" style="left:${eX}px;top:${eY}px;max-width:160px;font-size:11px" onclick="openDetail(${e.id})" title="${e.title}">${e.title.length > 16 ? e.title.slice(0,16)+'...' : e.title}</div>`;
+        }
+      });
+    });
+  });
+
+  // SVG 连线层
+  const svgLines = `<svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0" viewBox="0 0 ${w} 500">
+    <line x1="${cx}" y1="${centerY+20}" x2="${cats.length>0 ? 100 : 0}" y2="100" stroke="#c4c6cc" stroke-width="1"/>
+    <line x1="${cx}" y1="${centerY+20}" x2="${cats.length>1 ? w-120 : 0}" y2="100" stroke="#c4c6cc" stroke-width="1"/>
+  </svg>`;
+
+  container.style.height = '500px';
+  container.innerHTML = svgLines + '<div style="position:relative;z-index:1">' + html + '</div>';
+}
+
+// ===== 时间线 =====
+function renderTimeline() {
+  const sorted = [...store.entries].sort((a,b) => b.date.localeCompare(a.date));
+  const list = document.getElementById('timelineList');
+  if (sorted.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div>暂无记录</div></div>';
+  } else {
+    list.innerHTML = sorted.map(e => `
+      <div class="timeline-item" onclick="openDetail(${e.id})">
+        <div class="timeline-date">${e.date} · ${e.category} · ${e.subcategory}</div>
+        <div class="timeline-title">${e.title} ${'★'.repeat(e.stars)}</div>
+        <div style="font-size:12px;color:var(--text-sec);margin-top:2px">${e.tags.map(t => '#' + t).join(' ')}</div>
+      </div>`).join('');
+  }
+}
+
+// ===== 阅读清单 =====
+function renderReading() {
+  const unread = store.entries.filter(e => !e.read).sort((a,b) => b.stars - a.stars);
+  const list = document.getElementById('readingList');
+  if (unread.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div>所有知识已阅读完毕！</div></div>';
+  } else {
+    list.innerHTML = `<div style="font-size:12px;color:var(--text-sec);margin-bottom:12px">共 ${unread.length} 篇待读</div>` + unread.map(renderEntry).join('');
+  }
+}
+
+// ===== 详情 =====
+function openDetail(id) {
+  const e = store.entries.find(x => x.id === id);
+  if (!e) return;
+  const stars = '★'.repeat(e.stars) + '☆'.repeat(5-e.stars);
+  const tagsHtml = e.tags.map(t => `<span class="kn-tag">${t}</span>`).join('');
+  const linksHtml = e.links && e.links.length ? e.links.map(id => {
+    const l = store.entries.find(x => x.id === id);
+    return l ? `<div style="margin-top:6px;cursor:pointer;color:var(--primary)" onclick="openDetail(${id})">🔗 ${l.title}</div>` : '';
+  }).join('') : '';
+
+  showModal(e.title, `
+    <div style="margin-bottom:12px">
+      <span class="kn-cat ${e.category==='工作知识'?'kn-cat-work':'kn-cat-personal'}">${e.category} · ${e.subcategory}</span>
+      <span style="margin-left:8px;color:#f0c040">${stars}</span>
+      <span style="margin-left:8px;color:var(--text-hint);font-size:12px">${e.date}</span>
+    </div>
+    <div style="font-size:14px;line-height:1.8;margin-bottom:16px;white-space:pre-wrap">${e.content}</div>
+    <div style="margin-bottom:12px">${tagsHtml}</div>
+    ${e.source ? `<div style="font-size:13px;color:var(--text-sec);margin-bottom:8px">来源：${e.source}</div>` : ''}
+    ${e.url ? `<div style="margin-bottom:12px"><a href="${e.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;color:var(--primary);font-size:13px;font-weight:500;text-decoration:none;padding:6px 14px;border:1px solid var(--primary);border-radius:6px">📖 查看原文 ↗</a></div>` : ''}
+    ${linksHtml ? `<div style="border-top:1px solid var(--border);padding-top:12px"><div style="font-size:13px;font-weight:600;margin-bottom:6px">关联知识</div>${linksHtml}</div>` : ''}
+  `, () => { closeModal(); markRead(id); });
+  document.getElementById('modalConfirm').textContent = '已读';
+}
+
+function markRead(id) {
+  const e = store.entries.find(x => x.id === id);
+  if (e && !e.read) { e.read = true; saveData(); renderAll(); renderDashboard(); }
+}
+function toggleRead(id) {
+  const e = store.entries.find(x => x.id === id);
+  if (e) { e.read = !e.read; saveData(); renderAll(); renderDashboard(); showToast(e.read ? '已标为已读' : '已标为未读'); }
+}
+
+// ===== 添加/编辑 =====
+function openAddModal() {
+  editId = null;
+  document.getElementById('modalTitle').textContent = '添加知识';
+  showModal('添加知识', getEntryForm(), () => {
+    const entry = collectForm();
+    if (!entry.title) { showToast('请填写标题'); return; }
+    entry.id = store.nextId++;
+    entry.date = entry.date || todayStr();
+    entry.read = false;
+    entry.links = [];
+    store.entries.unshift(entry);
+    saveData();
+    closeModal();
+    renderAll();
+    renderDashboard();
+    showToast('知识已添加');
+  });
+}
+
+function openEditModal(id) {
+  const e = store.entries.find(x => x.id === id);
+  if (!e) return;
+  editId = id;
+  document.getElementById('modalTitle').textContent = '编辑知识';
+  showModal('编辑知识', getEntryForm(e), () => {
+    const data = collectForm();
+    if (!data.title) { showToast('请填写标题'); return; }
+    Object.assign(e, data);
+    saveData();
+    closeModal();
+    renderAll();
+    renderDashboard();
+    showToast('已保存修改');
+  });
+}
+
+function getEntryForm(e) {
+  e = e || {};
+  return `
+    <div class="form-group"><label class="form-label">标题 *</label><input id="fTitle" style="width:100%" value="${e.title||''}" placeholder="知识标题"></div>
+    <div class="form-group"><label class="form-label">内容</label><textarea id="fContent" style="width:100%" rows="5" placeholder="知识正文内容...">${e.content||''}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">分类 *</label><select id="fCat" style="width:100%" onchange="updateSubOptions()">
+        <option value="工作知识" ${e.category==='工作知识'?'selected':''}>工作知识</option>
+        <option value="个人知识" ${e.category==='个人知识'?'selected':''}>个人知识</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">子分类 *</label><select id="fSub" style="width:100%">
+        ${getSubOptions(e.category, e.subcategory)}
+      </select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">标签（逗号分隔）</label><input id="fTags" style="width:100%" value="${(e.tags||[]).join(', ')}" placeholder="如：党建, 基层, 案例"></div>
+      <div class="form-group"><label class="form-label">星级</label><select id="fStars" style="width:100%">
+        ${[1,2,3,4,5].map(s => `<option value="${s}" ${e.stars===s?'selected':''}>${'★'.repeat(s)}${'☆'.repeat(5-s)}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">来源</label><input id="fSource" style="width:100%" value="${e.source||''}" placeholder="来源（如：知网、学习笔记）"></div>
+      <div class="form-group"><label class="form-label">日期</label><input id="fDate" type="date" style="width:100%" value="${e.date||todayStr()}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">原文链接</label><input id="fUrl" style="width:100%" value="${e.url||''}" placeholder="https://... (可留空)"></div>
+  `;
+}
+
+function getSubOptions(cat, selected) {
+  cat = cat || '工作知识';
+  const subs = cat === '工作知识' ? ['课题研究','国资央企','党校工作','干部队伍建设','党的理论'] : ['工作技能','自媒体','兴趣爱好'];
+  return subs.map(s => `<option value="${s}" ${selected===s?'selected':''}>${s}</option>`).join('');
+}
+
+function updateSubOptions() {
+  const cat = document.getElementById('fCat').value;
+  document.getElementById('fSub').innerHTML = getSubOptions(cat, '');
+}
+
+function collectForm() {
+  return {
+    title: val('fTitle'),
+    content: val('fContent'),
+    category: val('fCat'),
+    subcategory: val('fSub'),
+    tags: val('fTags').split(/[,，]/).map(t => t.trim()).filter(Boolean),
+    stars: parseInt(val('fStars')) || 3,
+    source: val('fSource'),
+    date: val('fDate'),
+    url: val('fUrl')
+  };
+}
+
+function delEntry(id) {
+  if (!confirm('确认删除这条知识？')) return;
+  store.entries = store.entries.filter(e => e.id !== id);
+  // 清理关联引用
+  store.entries.forEach(e => { if (e.links) e.links = e.links.filter(l => l !== id); });
+  saveData();
+  renderAll();
+  renderDashboard();
+  showToast('已删除');
+}
+
+// ===== 模态框 =====
+function showModal(title, bodyHtml, onConfirm) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('modalConfirm').onclick = onConfirm;
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+// ===== 手机侧边栏抽屉 =====
+function toggleDrawer() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('drawerOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+function closeDrawer() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('show');
+}
+
+// ===== 手机搜索同步 =====
+function syncSearch(val) {
+  document.getElementById('globalSearch').value = val;
+  handleSearch(val);
+}
+
+// ===== 手机底部导航高亮 =====
+function updateMobileNav(view) {
+  document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+  const map = { dashboard:0, all:1, push:2, reading:3, graph:4 };
+  if (map[view] !== undefined) {
+    document.querySelectorAll('.mobile-nav-item')[map[view]].classList.add('active');
+  }
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== 导入导出 =====
+function exportData() {
+  const data = JSON.stringify(store, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `知识库_${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('数据已导出');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      store = JSON.parse(e.target.result);
+      saveData();
+      switchView('dashboard');
+      showToast('导入成功');
+    } catch(err) { showToast('导入失败：格式错误'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ===== 初始化 =====
+saveData(); // 确保新版本数据被持久化
+renderDashboard();
+</script>
+</body>
+</html>
